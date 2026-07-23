@@ -1,0 +1,9 @@
+# 日志文件
+wecom-proxy-*.log
+
+# 环境变量配置（可能包含 AUTH_TOKEN 等敏感信息）
+.env
+
+# Node.js
+node_modules/
+.workbuddy/
