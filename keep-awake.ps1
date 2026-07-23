@@ -22,7 +22,7 @@ public class KeepAwake {
     [KeepAwake]::ES_DISPLAY_REQUIRED
 )
 
-Write-Host "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') KeepAwake 已启动 - 系统将不会自动休眠/关机"
+Write-Host "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') KeepAwake started - the system will stay awake"
 $count = 0
 
 while ($true) {
@@ -32,6 +32,6 @@ while ($true) {
     Start-Sleep -Seconds 60
     
     if ($count % 60 -eq 0) {
-        Write-Host "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') KeepAwake 守护中 (已运行 $count 分钟)"
+        Write-Host "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') KeepAwake heartbeat ($count minutes)"
     }
 }

@@ -1,0 +1,19 @@
+
+═══════════════════════════════════════════════
+  WeCom API Proxy Server
+═══════════════════════════════════════════════
+  Listen address : 0.0.0.0:8080
+  Target service : https://qyapi.weixin.qq.com
+  Auth mode : disabled
+  Log file : D:\project\wecom-proxy\wecom-proxy-2026-07-23.log
+───────────────────────────────────────────────
+  Usage:
+  Original → https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=xxx&corpsecret=xxx
+  Proxy → http://<public-ip>:8080/cgi-bin/gettoken?corpid=xxx&corpsecret=xxx
+───────────────────────────────────────────────
+  Notes:
+  · Set auth:  set AUTH_TOKEN=xxx  then restart
+  · Set port:  node wecom-proxy.js 8080
+  · Ensure firewall allows port 8080
+═══════════════════════════════════════════════
+

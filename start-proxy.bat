@@ -1,29 +1,26 @@
 @echo off
+setlocal enableextensions
 cd /d "%~dp0"
 
-REM ── 环境变量配置（按需修改）────────────────────────
-set PORT=8080
-REM set AUTH_TOKEN=your_token
-REM ────────────────────────────────────────────────────
-
-REM Kill any existing process on the target port
-for /f "tokens=5" %%a in ('netstat -ano ^| find ":%PORT%" ^| find "LISTENING"') do (
-    echo Killing old proxy PID: %%a ...
-    taskkill /F /PID %%a >nul 2>&1
-    timeout /t 2 /nobreak >nul
+echo [start] Starting WeCom proxy...
+echo [start] Current dir: %CD%
+where node >nul 2>&1
+if errorlevel 1 (
+    echo [error] Node.js not found. Please install Node.js first.
+    pause
+    exit /b 1
 )
 
-echo ============================================
-echo   WeCom API Proxy
-echo ============================================
-echo   Listen: 0.0.0.0:%PORT%
-echo   Target: https://qyapi.weixin.qq.com
-echo   Logs:   wecom-proxy-YYYY-MM-DD.log
-echo ============================================
-echo   Client: http://<内网IP或外网IP>:%PORT%/cgi-bin/...
-echo   Stop:   Ctrl+C or close this window
-echo ============================================
-echo.
+for /f "tokens=5" %%a in ('netstat -ano ^| findstr ":8080" ^| findstr LISTENING') do (
+    echo [start] Port 8080 is in use by PID %%a. Stopping it...
+    taskkill /F /PID %%a >nul 2>&1
+)
 
+echo [start] Launching wecom-proxy.js
+echo [start] The proxy will keep running until you close this window.
+echo [start] Press Ctrl+C to stop.
 node wecom-proxy.js
+if errorlevel 1 (
+    echo [error] Proxy exited with error code %ERRORLEVEL%.
+)
 pause

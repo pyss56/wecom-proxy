@@ -7,6 +7,7 @@
 
 $ErrorActionPreference = "Stop"
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$BatchFile = Join-Path $ScriptDir "start-proxy.bat"
 
 # 查找 Node.js：优先从 PATH 获取，失败则尝试常见安装路径
 $NodeExe = (Get-Command node -ErrorAction SilentlyContinue).Source
@@ -41,7 +42,7 @@ Get-ScheduledTask -TaskName $taskName -ErrorAction SilentlyContinue | Unregister
 
 $action = New-ScheduledTaskAction `
     -Execute "cmd.exe" `
-    -Argument ('/c cd /d "' + $ScriptDir + '" & "' + $NodeExe + '" wecom-proxy.js >> "' + $ScriptDir + '\wecom-proxy.log" 2>&1')
+    -Argument ('/c cd /d "' + $ScriptDir + '" & "' + $BatchFile + '"')
 
 $trigger = New-ScheduledTaskTrigger -AtStartup
 $principal = New-ScheduledTaskPrincipal -UserId $CurrentUser -RunLevel Highest
@@ -55,9 +56,8 @@ Register-ScheduledTask -TaskName $taskName -Action $action -Trigger $trigger `
     -Description "WeCom API Proxy - auto start on boot" -Force | Out-Null
 Write-Host "  [OK] WeComProxy task created" -ForegroundColor Green
 
-# ---- 2. Disable system sleep/hibernate ---------------------
-Write-Host "[2/3] Disabling system sleep/hibernate..." -ForegroundColor Yellow
-
+# ---- 2. Prevent sleep/hibernate --------------------------
+Write-Host "[2/3] Disabling sleep and hibernation..." -ForegroundColor Yellow
 powercfg /change standby-timeout-ac 0 2>$null
 powercfg /change hibernate-timeout-ac 0 2>$null
 powercfg /change disk-timeout-ac 0 2>$null
@@ -72,7 +72,7 @@ Get-ScheduledTask -TaskName $kaTaskName -ErrorAction SilentlyContinue | Unregist
 
 $kaAction = New-ScheduledTaskAction `
     -Execute "powershell.exe" `
-    -Argument ('-WindowStyle Hidden -ExecutionPolicy Bypass -File "' + $ScriptDir + '\keep-awake.ps1"')
+    -Argument ('-NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File "' + $ScriptDir + '\keep-awake.ps1"')
 
 $kaTrigger = New-ScheduledTaskTrigger -AtStartup
 $kaSettings = New-ScheduledTaskSettingsSet `
@@ -88,8 +88,8 @@ Write-Host "  [OK] KeepAwake task created" -ForegroundColor Green
 # ---- Launch immediately ------------------------------------
 Write-Host ""
 Write-Host "Starting proxy and keep-awake..." -ForegroundColor Yellow
-Start-Process "cmd.exe" -ArgumentList ('/c cd /d "' + $ScriptDir + '" & "' + $NodeExe + '" wecom-proxy.js') -WindowStyle Normal
-$kaArg = '-WindowStyle Hidden -ExecutionPolicy Bypass -File "' + $ScriptDir + '\keep-awake.ps1"'
+Start-Process "cmd.exe" -ArgumentList ('/c cd /d "' + $ScriptDir + '" & "' + $BatchFile + '"') -WindowStyle Normal
+$kaArg = '-NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File "' + $ScriptDir + '\keep-awake.ps1"'
 Start-Process "powershell.exe" -ArgumentList $kaArg -WindowStyle Hidden
 
 # ---- Done --------------------------------------------------
@@ -103,7 +103,7 @@ if (-not $publicIp) { $publicIp = "<SERVER_IP>" }
 $port = if ($env:PORT) { $env:PORT } else { "8080" }
 Write-Host "  Proxy URL  : http://${publicIp}:${port}"
 Write-Host "  Log file   : $ScriptDir\wecom-proxy.log"
-Write-Host "  Anti-sleep : Never sleep + KeepAwake daemon"
+Write-Host "  Anti-sleep : power settings + KeepAwake daemon"
 Write-Host ""
 Write-Host "  Press any key to exit..."
 $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
