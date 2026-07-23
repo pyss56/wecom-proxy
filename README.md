@@ -40,21 +40,10 @@
 
 ### 配置端口（可选）
 
-在项目目录下创建 `.env` 文件（已提供模板），修改端口号：
+编辑 `start-proxy.bat` 文件顶部的 `PORT` 即可：
 
-```bash
-# .env
-PORT=8080
-```
-
-代理启动时会自动加载 `.env` 文件中的配置。也可通过命令行参数或系统环境变量指定：
-
-```bash
-# 方式一：命令行参数（优先级最高）
-node wecom-proxy.js 9090
-
-# 方式二：系统环境变量
-set PORT=9090 && node wecom-proxy.js
+```bat
+set PORT=8080
 ```
 
 ### 手动启动
@@ -78,25 +67,7 @@ http://<本机外网IP>:8080/cgi-bin/gettoken?corpid=xxx&corpsecret=xxx
 
 > **提示**：同局域网内的设备可通过本机**内网 IP**（如 `192.168.x.x`）访问代理，外网设备则需通过**外网 IP** 访问。
 
-### 启用认证
 
-设置环境变量 `AUTH_TOKEN` 后，请求必须携带 `x-proxy-auth` 请求头或 `_auth` 查询参数才能通过代理。
-
-```bash
-set AUTH_TOKEN=mysecrettoken
-node wecom-proxy.js
-```
-
-请求示例：
-
-```bash
-# 方式一：请求头
-curl http://<IP>:8080/cgi-bin/gettoken?corpid=xxx \
-  -H "x-proxy-auth: mysecrettoken"
-
-# 方式二：查询参数
-curl "http://<IP>:8080/cgi-bin/gettoken?corpid=xxx&_auth=mysecrettoken"
-```
 
 ## 一键部署（Windows）
 
@@ -131,12 +102,11 @@ wecom-proxy-YYYY-MM-DD.log
 
 ## 环境变量
 
-支持 `.env` 文件、系统环境变量、命令行参数三种方式配置（优先级：命令行参数 > 系统环境变量 > `.env` 文件）。
+在 `start-proxy.bat` 顶部配置端口，也可通过系统环境变量指定。
 
 | 变量 | 默认值 | 说明 |
 |------|--------|------|
 | `PORT` | `8080` | 监听端口 |
-| `AUTH_TOKEN` | (空) | 代理认证令牌，留空则不启用认证 |
 
 ## 保活机制
 

@@ -1,9 +1,8 @@
 @echo off
 cd /d "%~dp0"
 
-REM ── 环境变量配置（按需修改）────────────────────────
+REM ── 端口配置（按需修改）─────────────────────────────
 set PORT=8080
-REM set AUTH_TOKEN=your_token
 REM ────────────────────────────────────────────────────
 
 REM Kill any existing process on the target port
